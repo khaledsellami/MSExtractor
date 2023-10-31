@@ -3,6 +3,7 @@ import pickle
 import os
 import logging.config
 import datetime
+import re
 from typing import List, Optional, Dict
 
 import numpy as np
@@ -11,8 +12,16 @@ from analysis.local import LocalSemAnalyzer, LocalStrAnalyzer
 from msextractor import MSExtractor
 
 
-def is_link(path: str) -> bool:
-    return False # TODO
+def is_url(path_or_url: str) -> bool:
+    # from https://github.com/django/django/blob/stable/1.3.x/django/core/validators.py#L45
+    regex = re.compile(
+        r'^(?:http|ftp)s?://'  # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return re.match(regex, path_or_url) is not None
 
 
 def to_partitions(ind: np.ndarray, class_names: Optional[List[str]] = None) -> List[Dict]:
@@ -39,7 +48,7 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
                               })
     logger = logging.getLogger('Decomposer')
     logger.info(f"decomposing {app_name} with MSExtractor")
-    local_data = not is_link(data_path)
+    local_data = not is_url(data_path)
     logger.debug(f"loading data {'locally' if local_data else 'remotely'} from '{data_path}'")
     if local_data:
         app_data_path = os.path.join(data_path, app_name)
