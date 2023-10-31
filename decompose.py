@@ -1,5 +1,4 @@
 import json
-import pickle
 import os
 import logging.config
 import datetime
@@ -36,10 +35,10 @@ def to_partitions(ind: np.ndarray, class_names: Optional[List[str]] = None) -> L
 def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
               output_path: str = os.path.join(os.curdir, "logs"), max_n_clusters: int = 7, ngen: int = 1000,
               pop_size: int = 100, cx_pb: float = 0.3, mut_pb: float = 0.5, att_mut_pb: float = 0.09,
-              seed: Optional[int] = None, verbose: bool = False) -> Dict:
+              seed: Optional[int] = None, verbose: bool = False, run_id: Optional[str] = None) -> Dict:
 
     starting_time = datetime.datetime.now().strftime("%Y%m%d%H%M")
-    run_name = f"{app_name}_{starting_time}"
+    run_name = f"{'' if run_id is None else run_id+'_'}{app_name}_{starting_time}"
     result_path = os.path.join(output_path, app_name, run_name)
     os.makedirs(result_path, exist_ok=True)
     logging.config.fileConfig(os.path.join(os.curdir, 'logging.conf'), disable_existing_loggers=False,
@@ -47,6 +46,11 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
                                   "logfilename": os.path.join(result_path, "logs.log")
                               })
     logger = logging.getLogger('Decomposer')
+    if verbose:
+        for handler in logger.handlers:
+            if isinstance(handler, type(logging.StreamHandler())):
+                handler.setLevel(logging.DEBUG)
+                logger.debug('Debug logging enabled')
     logger.info(f"decomposing {app_name} with MSExtractor")
     local_data = not is_url(data_path)
     logger.debug(f"loading data {'locally' if local_data else 'remotely'} from '{data_path}'")
@@ -78,8 +82,8 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
     logger.debug(f"saving results in {result_path}")
     with open(os.path.join(result_path, "decomposition.json"), "w") as f:
         json.dump(decomposition, f, indent=4)
-    with open(os.path.join(result_path, "logbook.pkl"), "wb") as f:
-        pickle.dump(logbook, f)
+    with open(os.path.join(result_path, "logbook.json"), "w") as f:
+        json.dump(logbook, f, indent=2)
     logger.info("finished generating decomposition")
     return decomposition
 
