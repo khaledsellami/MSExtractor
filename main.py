@@ -1,7 +1,6 @@
 import argparse
 
 from decompose import decompose
-from experiment import run_experiment
 
 
 if __name__ == "__main__":
