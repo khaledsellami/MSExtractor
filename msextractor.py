@@ -41,7 +41,7 @@ class MSExtractor:
         np.random.seed(seed)
         random.seed(seed)
         self.toolbox = self.init_toolbox()
-        self.logger = logging.getLogger("MSExtractor") # TODO add logging config
+        self.logger = logging.getLogger("MSExtractor")
 
     def init_toolbox(self) -> base.Toolbox:
         creator.create("FitnessMax", base.Fitness, weights=self.weights)
