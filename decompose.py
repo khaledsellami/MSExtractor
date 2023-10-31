@@ -1,4 +1,3 @@
-import argparse
 import json
 import pickle
 import os
@@ -25,18 +24,10 @@ def to_partitions(ind: np.ndarray, class_names: Optional[List[str]] = None) -> L
     return partitions
 
 
-def decompose(args: argparse.Namespace) -> Dict:
-    app_name = args.APP
-    data_path = args.data
-    output_path = args.output
-    max_n_clusters = args.microservices
-    ngen = args.generations
-    pop_size = args.population
-    cx_pb = args.crossover
-    mut_pb = args.mutation
-    att_mut_pb = args.attribute
-    seed = args.seed
-    verbose = args.verbose
+def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
+              output_path: str = os.path.join(os.curdir, "logs"), max_n_clusters: int = 7, ngen: int = 1000,
+              pop_size: int = 100, cx_pb: float = 0.3, mut_pb: float = 0.5, att_mut_pb: float = 0.09,
+              seed: Optional[int] = None, verbose: bool = False) -> Dict:
 
     starting_time = datetime.datetime.now().strftime("%Y%m%d%H%M")
     run_name = f"{app_name}_{starting_time}"

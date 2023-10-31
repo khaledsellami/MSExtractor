@@ -19,7 +19,6 @@ if __name__ == "__main__":
     decompose_parser.add_argument("-d", "--data", help='path for the data or github link for the source code',
                                   type=str, default="./data")
     decompose_parser.add_argument("-o", "--output", help='path for the output', type=str, default="./logs")
-    # decompose_parser.add_argument("-l", "--link", help='github link for the source code', default=None)
     decompose_parser.add_argument("-m", "--microservices", help='maximum number of microservices', type=int, default=7)
     decompose_parser.add_argument("-G", "--generations", help='number of generations', type=int, default=2000)
     decompose_parser.add_argument("-P", "--population", help='size of a population', type=int, default=100)
@@ -31,6 +30,21 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # route the task
     if args.subtask == "experiment":
-        run_experiment(args)
+        app_name = args.APP
+        max_max_n_clusters = args.max_microservices
+        min_max_n_clusters = args.min_microservices
+        run_experiment(app_name)
     elif args.subtask == "decompose":
-        decompose(args)
+        app_name = args.APP
+        data_path = args.data
+        output_path = args.output
+        max_n_clusters = args.microservices
+        ngen = args.generations
+        pop_size = args.population
+        cx_pb = args.crossover
+        mut_pb = args.mutation
+        att_mut_pb = args.attribute
+        seed = args.seed
+        verbose = args.verbose
+        decompose(app_name, data_path, output_path, max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, seed,
+                  verbose)
