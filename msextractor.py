@@ -48,8 +48,8 @@ class MSExtractor:
         creator.create("Individual", np.ndarray, fitness=creator.FitnessMax)
         toolbox = base.Toolbox()
         if self.multiprocess:
-            pool = multiprocessing.Pool()
-            toolbox.register("map", pool.map)
+            self.pool = multiprocessing.Pool()
+            toolbox.register("map", self.pool.map)
         toolbox.register("class_cluster", rand_cluster, n=len(self.classes), max_n=self.max_n_clusters+1)
         toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.class_cluster)
         toolbox.register("population", tools.initRepeat, list, toolbox.individual)
@@ -91,5 +91,7 @@ class MSExtractor:
         pop, logbook = algorithms.eaSimple(pop, self.toolbox, self.cx_pb, self.mut_pb, self.ngen,
                                                  stats=stats, verbose=self.verbose)
         ind = tools.selBest(pop, k=1)[0]
+        if self.multiprocess:
+            self.pool.close()
         self.logger.info("Finished MSExtractor run")
         return ind, logbook
