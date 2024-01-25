@@ -3,7 +3,7 @@ import argparse
 from decompose import decompose
 
 
-if __name__ == "__main__":
+def main():
     # Parsing input
     parser = argparse.ArgumentParser(
         prog='msextractor',
@@ -36,3 +36,7 @@ if __name__ == "__main__":
     run_id = args.name
     decompose(app_name, data_path, output_path, max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, seed,
               verbose, run_id)
+
+
+if __name__ == "__main__":
+    main()
