@@ -5,7 +5,8 @@ import math
 
 from user_config import DATA_PATH, ENV_PATH
 
-applications = ["plants", "acmeair", "daytrader", "petclinic-legacy", "roller"]
+applications = ["plants", "acmeair", "daytrader", "petclinic-legacy", "roller", "partsunlimitedmrp", "jpetstore-6",
+                "7ep-demo"]
 sizes = [40, 86, 118, 60, 531, 100, 43, 119]
 job_filename = "cc_job.sh"
 prefix_command = ""
