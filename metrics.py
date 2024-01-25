@@ -76,9 +76,7 @@ class Metrics:
         return 1 - coh / (size_cluster * (size_cluster - 1) / 2)
 
     def cohesion(self, clusters):
-        cohesion = 0
-        for cluster in clusters:
-            cohesion += self.coh(cluster)
+        cohesion = np.sum([self.coh(cluster) for cluster in clusters])
         return 1 - cohesion / len(clusters)
 
     def coup(self, interfacei, interfacej):
