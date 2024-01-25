@@ -1,5 +1,6 @@
 import json
 import os
+import logging
 from typing import Union, List
 
 import numpy as np
@@ -14,6 +15,7 @@ class LocalStrAnalyzer(StrAnalyzer):
         # self.metadata_path = os.path.join(data_path, "static_analysis_results")
         self.class_names = None
         self.class_relations = None
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.build()
 
     def get_classes(self) -> Union[np.ndarray, List[str]]:
@@ -21,6 +23,7 @@ class LocalStrAnalyzer(StrAnalyzer):
 
     def get_public_classes(self) -> np.ndarray:
         # TODO: add logic for public classes
+        self.logger.warning("Incomplete implementation for public class information, using default behaviour instead!")
         return np.array([1 for c in self.class_names])
 
     def get_calls(self) -> np.ndarray:
