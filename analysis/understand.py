@@ -1,4 +1,5 @@
 import re
+import logging
 from typing import Union, List
 
 import numpy as np
@@ -108,6 +109,7 @@ class UnderSemAnalyzer(SemAnalyzer):
         self.vocabulary = set()
         self.stemmer = None
         self.debugging = debugging
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.build()
 
     def get_classes(self) -> Union[np.ndarray, List[str]]:
@@ -126,7 +128,7 @@ class UnderSemAnalyzer(SemAnalyzer):
 
     def get_words(self, class_):
         if self.debugging:
-            print("working on class ", class_, ":")
+            self.logger.debug("working on class ", class_, ":")
         class_ref = self.db.ent_from_id(class_)
         self.class_words[class_] = list()
         debug_string = "    Found: "
@@ -160,7 +162,7 @@ class UnderSemAnalyzer(SemAnalyzer):
                 self.analyze(word, class_)
         debug_string += str(len(methods)) + " methods."
         if self.debugging:
-            print(debug_string)
+            self.logger.debug(debug_string)
 
     def analyze(self, word, class_):
         words = self.preprocess(word)
