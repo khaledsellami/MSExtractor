@@ -8,6 +8,7 @@ from typing import List, Optional, Dict
 import numpy as np
 
 from analysis.local import LocalSemAnalyzer, LocalStrAnalyzer
+from analysis.remote import RemoteSemAnalyzer, RemoteStrAnalyzer
 from msextractor import MSExtractor
 
 
@@ -33,14 +34,18 @@ def to_partitions(ind: np.ndarray, class_names: Optional[List[str]] = None) -> L
 
 
 def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
-              output_path: str = os.path.join(os.curdir, "logs"), max_n_clusters: int = 7, ngen: int = 1000,
+              output_path: Optional[str] = os.path.join(os.curdir, "logs"), max_n_clusters: int = 7, ngen: int = 1000,
               pop_size: int = 100, cx_pb: float = 0.3, mut_pb: float = 0.5, att_mut_pb: float = 0.09,
               seed: Optional[int] = None, verbose: bool = False, run_id: Optional[str] = None,
               calculate_stats: bool = False) -> Dict:
     starting_time = datetime.datetime.now().strftime("%Y%m%d%H%M")
     run_name = f"{app_name if run_id is None else run_id}_{starting_time}"
-    result_path = os.path.join(output_path, app_name, run_name)
-    os.makedirs(result_path, exist_ok=True)
+    if output_path is not None:
+        result_path = os.path.join(output_path, app_name, run_name)
+        os.makedirs(result_path, exist_ok=True)
+    else:
+        result_path = os.path.join(os.curdir, "temp")
+        os.makedirs(result_path, exist_ok=True)
     logging.config.fileConfig(os.path.join(os.curdir, 'logging.conf'), disable_existing_loggers=False,
                               defaults={
                                   "logfilename": os.path.join(result_path, "logs.log")
@@ -59,7 +64,8 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
         stra = LocalStrAnalyzer(app_data_path)
         sema = LocalSemAnalyzer(app_data_path)
     else:
-        raise NotImplementedError()
+        stra = RemoteStrAnalyzer(app_name, data_path)
+        sema = RemoteSemAnalyzer(app_name, data_path)
     logger.debug("initializing MSExtractor")
     mse = MSExtractor(stra, sema, max_n_clusters=max_n_clusters, ngen=ngen, pop_size=pop_size, cx_pb=cx_pb,
                       mut_pb=mut_pb, att_mut_pb=att_mut_pb, verbose=verbose, seed=seed,
@@ -80,17 +86,18 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
     )
     if not local_data:
         decomposition["appRepo"] = data_path
-    logger.debug(f"saving results in {result_path}")
-    hyperparams = {i: j for i, j in zip(
-        ["max_n_clusters", "ngen", "pop_size", "cx_pb", "mut_pb", "att_mut_pb", "alpha"],
-        [max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, mse.alpha]
-    )}
-    with open(os.path.join(result_path, "decomposition.json"), "w") as f:
-        json.dump(decomposition, f, indent=4)
-    with open(os.path.join(result_path, "hyperparams.json"), "w") as f:
-        json.dump(hyperparams, f, indent=4)
-    with open(os.path.join(result_path, "logbook.json"), "w") as f:
-        json.dump(logbook, f, indent=2)
+    if output_path is not None:
+        logger.debug(f"saving results in {result_path}")
+        hyperparams = {i: j for i, j in zip(
+            ["max_n_clusters", "ngen", "pop_size", "cx_pb", "mut_pb", "att_mut_pb", "alpha"],
+            [max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, mse.alpha]
+        )}
+        with open(os.path.join(result_path, "decomposition.json"), "w") as f:
+            json.dump(decomposition, f, indent=4)
+        with open(os.path.join(result_path, "hyperparams.json"), "w") as f:
+            json.dump(hyperparams, f, indent=4)
+        with open(os.path.join(result_path, "logbook.json"), "w") as f:
+            json.dump(logbook, f, indent=2)
     logger.info("finished generating decomposition")
     return decomposition
 
