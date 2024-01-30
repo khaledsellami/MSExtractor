@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.decomp.msextractor";
+option java_outer_classname = "MSExtractorProto";
+option objc_class_prefix = "MSE";
+
+package msextractor;
+
+
+service MSExtractor {
+  rpc getDecomposition (DecompRequest) returns (Decomposition) {};
+}
+
+message DecompRequest {
+  string appName = 1;
+  string appData = 2; // Github URL or path to data
+  optional HyperParameters hyperParameters = 3;
+}
+
+message HyperParameters {
+  optional string DecompositionName = 1;
+  optional int32 numMicroservices = 2;
+  optional int64 numGenerations = 3;
+  optional int64 numPopulations = 4;
+  optional float mutationProb = 5;
+  optional float attributeProb = 6;
+  optional float crossoverProb = 7;
+  optional int64 seed = 8;
+}
+
+message Partition {
+  string name = 1;
+  repeated string classes = 2;
+}
+
+message Decomposition {
+  string name = 1;
+  string appName = 2;
+  string language = 3;
+  string level = 4;
+  repeated Partition partitions = 5;
+}
+
+
