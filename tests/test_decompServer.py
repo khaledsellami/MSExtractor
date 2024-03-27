@@ -6,8 +6,8 @@ import dill
 
 import grpc
 
-from models.msextractor_pb2 import DecompRequest, HyperParameters
-from models.msextractor_pb2_grpc import MSExtractorStub
+from models import msextractor_pb2 as mpb2
+from models import msextractor_pb2_grpc as mpb2g
 
 
 TEST_APP = "petclinic-legacy"#"jpetstore-6"
@@ -20,12 +20,12 @@ class TestDecompServer(unittest.TestCase):
         with open(os.path.join(test_path, "decomposition.pickle"), "rb") as f:
             expected_decomposition = dill.load(f)
             expected_decomposition = [p["classes"] for p in expected_decomposition["partitions"]]
-        hps = HyperParameters(numGenerations=5, numPopulations=50, seed=42)
-        request = DecompRequest(appName=TEST_APP, appData="https://github.com/SarahBornais/jpetstore-6",
+        hps = mpb2.HyperParameters(numGenerations=5, numPopulations=50, seed=42)
+        request = mpb2.DecompRequest(appName=TEST_APP, appData="https://github.com/SarahBornais/jpetstore-6",
                                 hyperParameters=hps)
         msextractor_port = os.getenv('SERVICE_MSEXTRACTOR_PORT', 50060)
         with grpc.insecure_channel(f'localhost:{msextractor_port}') as channel:
-            stub = MSExtractorStub(channel)
+            stub = mpb2g.MSExtractorStub(channel)
             # Act
             decomposition = stub.getDecomposition(request)
             decomposition = [partition.classes for partition in decomposition.partitions]
