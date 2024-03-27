@@ -29,6 +29,8 @@ def main():
     cli_parser.add_argument("-s", "--seed", help='RNG seed', type=int, default=None)
     cli_parser.add_argument("-v", "--verbose", help='logging verbosity', action="store_true")
     cli_parser.add_argument("-n", "--name", help='name of the decomposition run', type=str, default=None)
+    cli_parser.add_argument("-g", "--granularity", help='granularity level of the decomposition', type=str,
+                            default="class", options=["class", "method"])
     # server subtask
     server_parser = subparsers.add_parser("start", description="start the MSExtractor server")
     # configure logging

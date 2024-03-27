@@ -34,7 +34,7 @@ class Metrics:
         #     self.public_methods = None
 
         if self.interface == "public":
-            self.public_classes = str_analyzer.get_public_classes()
+            self.public_classes = str_analyzer.get_public_atoms()
         else:
             self.public_classes = None
         self.version = version

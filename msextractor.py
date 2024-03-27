@@ -23,7 +23,7 @@ class MSExtractor:
                  verbose: bool = False, calculate_stats: bool = False, seed: Optional[int] = None):
         self.alpha = alpha
         self.metrics = Metrics(str_analyzer, sem_analyzer, alpha=self.alpha, version=version)
-        self.classes = str_analyzer.get_classes()
+        self.classes = str_analyzer.get_names()
         self.max_n_clusters = max_n_clusters
         self.weights = weights
         self.min_class_per_cluster = min_class_per_cluster

@@ -37,7 +37,7 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
               output_path: Optional[str] = os.path.join(os.curdir, "logs"), max_n_clusters: int = 7, ngen: int = 1000,
               pop_size: int = 100, cx_pb: float = 0.3, mut_pb: float = 0.5, att_mut_pb: float = 0.09,
               seed: Optional[int] = None, verbose: bool = False, run_id: Optional[str] = None,
-              calculate_stats: bool = False) -> Dict:
+              calculate_stats: bool = False, granularity: str = "class") -> Dict:
     starting_time = datetime.datetime.now().strftime("%Y%m%d%H%M")
     run_name = f"{app_name if run_id is None else run_id}_{starting_time}"
     if output_path is not None:
@@ -61,11 +61,11 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
     logger.debug(f"loading data {'locally' if local_data else 'remotely'} from '{data_path}'")
     if local_data:
         app_data_path = os.path.join(data_path, app_name)
-        stra = LocalStrAnalyzer(app_data_path)
-        sema = LocalSemAnalyzer(app_data_path)
+        stra = LocalStrAnalyzer(app_data_path, granularity=granularity)
+        sema = LocalSemAnalyzer(app_data_path, granularity=granularity)
     else:
-        stra = RemoteStrAnalyzer(app_name, data_path)
-        sema = RemoteSemAnalyzer(app_name, data_path)
+        stra = RemoteStrAnalyzer(app_name, data_path, granularity=granularity)
+        sema = RemoteSemAnalyzer(app_name, data_path, granularity=granularity)
     logger.debug("initializing MSExtractor")
     mse = MSExtractor(stra, sema, max_n_clusters=max_n_clusters, ngen=ngen, pop_size=pop_size, cx_pb=cx_pb,
                       mut_pb=mut_pb, att_mut_pb=att_mut_pb, verbose=verbose, seed=seed,
@@ -75,13 +75,13 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
     if verbose:
         logger.info(f"Acquired decomposition: {ind}")
     logger.debug("parsing results")
-    class_names = stra.get_classes()
+    class_names = stra.get_names()
     partitions = to_partitions(ind, class_names)
     decomposition = dict(
         name=run_name,
         appName=app_name,
         language="java",
-        level="class",
+        level=granularity,
         partitions=partitions
     )
     if not local_data:

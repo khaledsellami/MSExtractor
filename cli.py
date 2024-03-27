@@ -15,6 +15,7 @@ def cli(args):
     seed = args.seed
     verbose = args.verbose
     run_id = args.name
+    granularity = args.granularity
     # run decomposition
     decompose(app_name, data_path, output_path, max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, seed,
-              verbose, run_id)
+              verbose, run_id, granularity)
