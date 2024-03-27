@@ -1,5 +1,6 @@
 from typing import Union, List
 import logging
+import warnings
 
 import numpy as np
 
@@ -33,7 +34,7 @@ class RemoteStrAnalyzer(StrAnalyzer):
 
     def get_public_methods(self) -> np.ndarray:
         # TODO: add logic for public methods
-        self.logger.warning("Incomplete implementation for public class information, using default behaviour instead!")
+        self.logger.warning("Incomplete implementation for public method information, using default behaviour instead!")
         return np.array([1 for c in self.method_names])
 
     def get_calls(self) -> np.ndarray:
@@ -61,8 +62,10 @@ class RemoteStrAnalyzer(StrAnalyzer):
         calls_inc[calls_inc == 0] = np.inf
         calls_inc_div = (calls_inc != np.inf).astype(int).reshape((1, -1)) + (calls_inc.transpose() != np.inf).astype(
             int).reshape((-1, 1))
-        self.sim_str = np.nan_to_num(
-            (((self.class_relations / calls_inc) + (self.class_relations / calls_inc).transpose()) / calls_inc_div))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.sim_str = np.nan_to_num(
+                (((self.class_relations / calls_inc) + (self.class_relations / calls_inc).transpose()) / calls_inc_div))
 
 
 class RemoteSemAnalyzer(SemAnalyzer):

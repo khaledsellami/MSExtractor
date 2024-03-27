@@ -28,7 +28,7 @@ def to_partitions(ind: np.ndarray, class_names: Optional[List[str]] = None) -> L
     class_names = class_names if class_names is not None else [f"class_{i}" for i in range(len(ind))]
     assert len(class_names) == len(ind)
     partitions = [{"name": f"partition_{i}",
-                      "classes":[class_names[c] for c in np.where(ind == i)[0]]
+                      "classes":[class_names[int(c)] for c in np.where(ind == i)[0]]
                       } for i in np.unique(ind)]
     return partitions
 
