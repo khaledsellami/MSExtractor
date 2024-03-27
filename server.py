@@ -41,7 +41,7 @@ class DecompServer(mpb2g.MSExtractorServicer):
         verbose = True
         max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, run_id, seed = parse_hyperparameters(request)
         decomposition = decompose(app_name, data_path, output_path, max_n_clusters, ngen, pop_size, cx_pb, mut_pb,
-                                  att_mut_pb, seed, verbose, run_id, level, is_distributed)
+                                  att_mut_pb, seed, verbose, run_id, granularity=level, is_distributed=is_distributed)
         return mpb2.Decomposition(name=decomposition["name"], appName=decomposition["appName"],
                              language=decomposition["language"], level=decomposition["level"],
                              partitions=[mpb2.Partition(name=p["name"], classes=p["classes"]) for p in

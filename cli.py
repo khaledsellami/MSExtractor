@@ -19,4 +19,4 @@ def cli(args):
     is_distributed = args.distributed
     # run decomposition
     decompose(app_name, data_path, output_path, max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, seed,
-              verbose, run_id, granularity, is_distributed)
+              verbose, run_id, granularity=granularity, is_distributed=is_distributed)
