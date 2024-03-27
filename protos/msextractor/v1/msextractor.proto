@@ -5,6 +5,7 @@ option java_package = "com.decomp.msextractor";
 option java_outer_classname = "MSExtractorProto";
 option objc_class_prefix = "MSE";
 
+// version 1
 package msextractor;
 
 
