@@ -4,10 +4,11 @@ import numpy as np
 
 
 class StrAnalyzer:
-    def __init__(self, granularity: str = "class"):
+    def __init__(self, granularity: str = "class", is_distributed: bool = False):
         assert granularity in ["class", "method"]
         self.sim_str: Union[np.ndarray, None] = None
         self.granularity = granularity
+        self.is_distributed = is_distributed
 
     def get_matrix(self):
         return self.sim_str
@@ -35,10 +36,11 @@ class StrAnalyzer:
 
 
 class SemAnalyzer:
-    def __init__(self, granularity: str = "class"):
+    def __init__(self, granularity: str = "class", is_distributed: bool = False):
         assert granularity in ["class", "method"]
         self.sim_sem: Union[np.ndarray, None] = None
         self.granularity = granularity
+        self.is_distributed = is_distributed
 
     def get_matrix(self):
         return self.sim_sem

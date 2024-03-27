@@ -9,9 +9,10 @@ from clients.parsingClient import ParsingClient
 
 
 class RemoteStrAnalyzer(StrAnalyzer):
-    def __init__(self, app_name: str, app_repo: str = "", granularity: str = "class"):
-        super().__init__(granularity)
-        self.parsing_client = ParsingClient(app_name, app_repo, granularity=granularity)
+    def __init__(self, app_name: str, app_repo: str = "", granularity: str = "class", is_distributed: bool = False):
+        super().__init__(granularity, is_distributed)
+        self.parsing_client = ParsingClient(app_name, app_repo, granularity=granularity,
+                                            is_distributed=self.is_distributed)
         self.sim_str: Union[np.ndarray, None] = None
         self.class_names = None
         self.method_names = None
@@ -65,9 +66,10 @@ class RemoteStrAnalyzer(StrAnalyzer):
 
 
 class RemoteSemAnalyzer(SemAnalyzer):
-    def __init__(self, app_name: str, app_repo: str = "", granularity: str = "class"):
-        super().__init__(granularity)
-        self.parsing_client = ParsingClient(app_name, app_repo, granularity=granularity)
+    def __init__(self, app_name: str, app_repo: str = "", granularity: str = "class", is_distributed: bool = False):
+        super().__init__(granularity, is_distributed)
+        self.parsing_client = ParsingClient(app_name, app_repo, granularity=granularity,
+                                            is_distributed=self.is_distributed)
         self.sim_sem: Union[np.ndarray, None] = None
         self.class_names = None
         self.method_names = None

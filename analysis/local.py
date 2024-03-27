@@ -9,8 +9,8 @@ from analysis.analyzer import SemAnalyzer, StrAnalyzer
 
 
 class LocalStrAnalyzer(StrAnalyzer):
-    def __init__(self, data_path: str, granularity: str = "class"):
-        super().__init__(granularity)
+    def __init__(self, data_path: str, granularity: str = "class", is_distributed: bool = False):
+        super().__init__(granularity, is_distributed)
         self.str_path = os.path.join(data_path, "structural_data")
         # self.metadata_path = os.path.join(data_path, "static_analysis_results")
         self.class_names = None
@@ -71,8 +71,8 @@ class LocalStrAnalyzer(StrAnalyzer):
 
 
 class LocalSemAnalyzer(SemAnalyzer):
-    def __init__(self, data_path: str, granularity: str = "class"):
-        super().__init__(granularity)
+    def __init__(self, data_path: str, granularity: str = "class", is_distributed: bool = False):
+        super().__init__(granularity, is_distributed)
         self.sem_path = os.path.join(data_path, "semantic_data")
         self.class_names = None
         self.method_names = None

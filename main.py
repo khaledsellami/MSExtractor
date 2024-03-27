@@ -31,6 +31,8 @@ def main():
     cli_parser.add_argument("-n", "--name", help='name of the decomposition run', type=str, default=None)
     cli_parser.add_argument("-g", "--granularity", help='granularity level of the decomposition', type=str,
                             default="class", options=["class", "method"])
+    cli_parser.add_argument("-di", "--distributed", help='application has a microservice architecture',
+                            action="store_true")
     # server subtask
     server_parser = subparsers.add_parser("start", description="start the MSExtractor server")
     # configure logging

@@ -17,17 +17,20 @@ class ParsingClient:
     SERVICE_NAME = os.getenv('SERVICE_PARSING', "localhost")
     PARSING_PORT = os.getenv('SERVICE_PARSING_PORT', 50500)
 
-    def __init__(self, app: str, app_repo: str = "", language: str = "java", granularity: str = "class"):
+    def __init__(self, app: str, app_repo: str = "", language: str = "java", granularity: str = "class",
+                 is_distributed: bool = False):
         self.app_name = app
         self.app_repo = app_repo
         self.language = language
         self.granularity = granularity
+        self.is_distributed = is_distributed
 
     def parse_all(self):
         with grpc.insecure_channel(f'{self.SERVICE_NAME}:{self.PARSING_PORT}') as channel:
             stub = ParserStub(channel)
             level = Granularity.Value(self.granularity.upper())
-            request = ParseRequest(appName=self.app_name, appRepo=self.app_repo, language=self.language, level=level)
+            request = ParseRequest(appName=self.app_name, appRepo=self.app_repo, language=self.language, level=level,
+                                   isDistributed=self.is_distributed)
             response = stub.parseAll(request)
             return response.status
 
@@ -36,7 +39,7 @@ class ParsingClient:
         with grpc.insecure_channel(f'{self.SERVICE_NAME}:{self.PARSING_PORT}') as channel:
             stub = ParserStub(channel)
             request = NamesRequest(appName=self.app_name, appRepo=self.app_repo, language=self.language,
-                                   level=granularity)
+                                   level=granularity, isDistributed=self.is_distributed)
             names = stub.getNames(request)
             return names.names
 
@@ -68,7 +71,7 @@ class ParsingClient:
     def get_matrix(self, function: Callable):
         level = Granularity.Value(self.granularity.upper())
         request = ParseRequest(appName=self.app_name, appRepo=self.app_repo, language=self.language,
-                               format=self.FORMAT, level=level)
+                               format=self.FORMAT, level=level, isDistributed=self.is_distributed)
         bytes_data = bytearray()
         for response in function(request):
             one_of = response.WhichOneof('response')
