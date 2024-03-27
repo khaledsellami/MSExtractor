@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from . import msextractor_pb2 as msextractor__pb2
+from . import msextractor_pb2 as msextractor_dot_v1_dot_msextractor__pb2
 
 
 class MSExtractorStub(object):
@@ -16,8 +16,8 @@ class MSExtractorStub(object):
         """
         self.getDecomposition = channel.unary_unary(
                 '/msextractor.MSExtractor/getDecomposition',
-                request_serializer=msextractor__pb2.DecompRequest.SerializeToString,
-                response_deserializer=msextractor__pb2.Decomposition.FromString,
+                request_serializer=msextractor_dot_v1_dot_msextractor__pb2.DecompRequest.SerializeToString,
+                response_deserializer=msextractor_dot_v1_dot_msextractor__pb2.Decomposition.FromString,
                 )
 
 
@@ -35,8 +35,8 @@ def add_MSExtractorServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'getDecomposition': grpc.unary_unary_rpc_method_handler(
                     servicer.getDecomposition,
-                    request_deserializer=msextractor__pb2.DecompRequest.FromString,
-                    response_serializer=msextractor__pb2.Decomposition.SerializeToString,
+                    request_deserializer=msextractor_dot_v1_dot_msextractor__pb2.DecompRequest.FromString,
+                    response_serializer=msextractor_dot_v1_dot_msextractor__pb2.Decomposition.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -60,7 +60,7 @@ class MSExtractor(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/msextractor.MSExtractor/getDecomposition',
-            msextractor__pb2.DecompRequest.SerializeToString,
-            msextractor__pb2.Decomposition.FromString,
+            msextractor_dot_v1_dot_msextractor__pb2.DecompRequest.SerializeToString,
+            msextractor_dot_v1_dot_msextractor__pb2.Decomposition.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
