@@ -4,7 +4,7 @@ import logging
 import numpy as np
 
 from analysis.analyzer import SemAnalyzer, StrAnalyzer
-from models.parse_pb2 import Granularity
+from models import Granularity
 from clients.parsingClient import ParsingClient
 
 
