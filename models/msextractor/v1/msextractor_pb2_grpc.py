@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import models.msextractor_pb2 as msextractor__pb2
+from . import msextractor_pb2 as msextractor__pb2
 
 
 class MSExtractorStub(object):
