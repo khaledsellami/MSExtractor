@@ -13,5 +13,5 @@ if __name__ == "__main__":
         version=__version__,
         packages=find_packages(exclude=['tests']),
         install_requires=requirements,
-        python_requires=">=3.9",
+        python_requires=">=3.8",
     )
