@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 
 from analysis.analyzer import SemAnalyzer, StrAnalyzer
-from models import Granularity
+from models.parse import Granularity
 from clients.parsingClient import ParsingClient
 
 

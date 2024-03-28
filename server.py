@@ -5,8 +5,8 @@ from concurrent import futures
 import grpc
 
 from decompose import decompose
-from models import msextractor_pb2 as mpb2
-from models import msextractor_pb2_grpc as mpb2g
+from models.msextractor import (add_MSExtractorServicer_to_server, Decomposition, DecompRequest, MSExtractorServicer,
+                                Partition)
 
 
 def parse_hyperparameters(request):
@@ -30,8 +30,8 @@ def parse_hyperparameters(request):
     return tuple(output)
 
 
-class DecompServer(mpb2g.MSExtractorServicer):
-    def getDecomposition(self, request: mpb2.DecompRequest, context):
+class DecompServer(MSExtractorServicer):
+    def getDecomposition(self, request: DecompRequest, context):
         app_name = request.appName
         data_path = request.appData
         level = request.level if request.HasField("level") else "class"
@@ -42,16 +42,16 @@ class DecompServer(mpb2g.MSExtractorServicer):
         max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, run_id, seed = parse_hyperparameters(request)
         decomposition = decompose(app_name, data_path, output_path, max_n_clusters, ngen, pop_size, cx_pb, mut_pb,
                                   att_mut_pb, seed, verbose, run_id, granularity=level, is_distributed=is_distributed)
-        return mpb2.Decomposition(name=decomposition["name"], appName=decomposition["appName"],
+        return Decomposition(name=decomposition["name"], appName=decomposition["appName"],
                              language=decomposition["language"], level=decomposition["level"],
-                             partitions=[mpb2.Partition(name=p["name"], classes=p["classes"]) for p in
+                             partitions=[Partition(name=p["name"], classes=p["classes"]) for p in
                                          decomposition["partitions"]])
 
 
 def serve():
     msextractor_port = os.getenv('SERVICE_MSEXTRACTOR_PORT', 50060)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    mpb2g.add_MSExtractorServicer_to_server(DecompServer(), server)
+    add_MSExtractorServicer_to_server(DecompServer(), server)
     server.add_insecure_port(f"[::]:{msextractor_port}")
     server.start()
     logging.info(f"MSExtractor server started, listening on {msextractor_port}")

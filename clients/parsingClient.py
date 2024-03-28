@@ -6,7 +6,7 @@ from typing import List, Callable
 import grpc
 import pandas as pd
 
-from models import ParserStub, NamesRequest, Granularity, ParseRequest, Status, Format
+from models.parse import ParserStub, NamesRequest, Granularity, ParseRequest, Status, Format
 
 
 class ParsingClient:
