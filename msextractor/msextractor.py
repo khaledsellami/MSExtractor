@@ -6,9 +6,9 @@ import random
 import numpy as np
 from deap import creator, base, tools, algorithms
 
-from metrics import Metrics
-from analysis.analyzer import SemAnalyzer, StrAnalyzer
-from ibea import selIBEA
+from .metrics import Metrics
+from .analysis import SemAnalyzer, StrAnalyzer
+from .ibea import selIBEA
 
 
 def rand_cluster(n: int, max_n: int):

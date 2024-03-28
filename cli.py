@@ -1,4 +1,4 @@
-from decompose import decompose
+from msextractor.decompose import decompose
 
 
 def cli(args):

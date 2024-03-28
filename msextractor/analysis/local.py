@@ -5,7 +5,7 @@ from typing import Union, List
 
 import numpy as np
 
-from analysis.analyzer import SemAnalyzer, StrAnalyzer
+from . import SemAnalyzer, StrAnalyzer
 
 
 class LocalStrAnalyzer(StrAnalyzer):

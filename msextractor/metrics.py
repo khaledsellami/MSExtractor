@@ -2,7 +2,7 @@ from typing import List
 
 import numpy as np
 
-from analysis.analyzer import SemAnalyzer, StrAnalyzer
+from .analysis import SemAnalyzer, StrAnalyzer
 
 
 def get_clusters(ind: np.ndarray) -> List[List[int]]:

@@ -7,9 +7,9 @@ from typing import List, Optional, Dict
 
 import numpy as np
 
-from analysis.local import LocalSemAnalyzer, LocalStrAnalyzer
-from analysis.remote import RemoteSemAnalyzer, RemoteStrAnalyzer
-from msextractor import MSExtractor
+from .analysis.local import LocalSemAnalyzer, LocalStrAnalyzer
+from .analysis.remote import RemoteSemAnalyzer, RemoteStrAnalyzer
+from .msextractor import MSExtractor
 
 
 def is_url(path_or_url: str) -> bool:

@@ -4,9 +4,9 @@ from concurrent import futures
 
 import grpc
 
-from decompose import decompose
-from models.msextractor import (add_MSExtractorServicer_to_server, Decomposition, DecompRequest, MSExtractorServicer,
-                                Partition)
+from msextractor.decompose import decompose
+from msextractor.models.msextractor import (add_MSExtractorServicer_to_server, Decomposition, DecompRequest,
+                                            MSExtractorServicer, Partition)
 
 
 def parse_hyperparameters(request):

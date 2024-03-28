@@ -7,7 +7,7 @@ from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from analysis.analyzer import SemAnalyzer, StrAnalyzer
+from . import SemAnalyzer, StrAnalyzer
 
 
 class UnderStrAnalyzer(StrAnalyzer):

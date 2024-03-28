@@ -4,9 +4,9 @@ import warnings
 
 import numpy as np
 
-from analysis.analyzer import SemAnalyzer, StrAnalyzer
-from models.parse import Granularity
-from clients.parsingClient import ParsingClient
+from . import SemAnalyzer, StrAnalyzer
+from ..models.parse import Granularity
+from ..clients.parsingClient import ParsingClient
 
 
 class RemoteStrAnalyzer(StrAnalyzer):
