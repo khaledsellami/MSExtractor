@@ -4,7 +4,6 @@ import logging
 from typing import Union, List
 
 import numpy as np
-import pandas as pd
 
 from . import SemAnalyzer, StrAnalyzer
 
@@ -12,7 +11,7 @@ from . import SemAnalyzer, StrAnalyzer
 class LocalStrAnalyzer(StrAnalyzer):
     def __init__(self, data_path: str, granularity: str = "class", is_distributed: bool = False):
         super().__init__(granularity, is_distributed)
-        self.str_path = data_path
+        self.str_path = os.path.join(data_path, "structural_data")
         # self.metadata_path = os.path.join(data_path, "static_analysis_results")
         self.class_names = None
         self.class_relations = None
@@ -37,23 +36,29 @@ class LocalStrAnalyzer(StrAnalyzer):
         return self.class_relations
 
     def build(self):
+        if self.granularity == "method":
+            self.load_methods()
+        else:
+            self.load_classes()
         self.load_calls()
         self.build_sim_matrix()
+
+    def load_classes(self):
+        # load classes
+        with open(os.path.join(self.str_path, "class_names.json"), "r") as f:
+            self.class_names = json.load(f)
 
     def get_methods(self) -> Union[np.ndarray, List[str]]:
         return self.method_names
 
+    def load_methods(self):
+        # load classes
+        with open(os.path.join(self.str_path, "method_names.json"), "r") as f:
+            self.method_names = json.load(f)
+
     def load_calls(self):
-        if self.granularity == "method":
-            filename = "method_calls.parquet"
-            self.class_relations = pd.read_parquet(os.path.join(self.str_path, filename))
-            self.method_names = list(self.class_relations.index.values)
-            self.class_relations = self.class_relations.values
-        else:
-            filename = "class_calls.parquet"
-            self.class_relations = pd.read_parquet(os.path.join(self.str_path, filename))
-            self.class_names = list(self.class_relations.index.values)
-            self.class_relations = self.class_relations.values
+        filename = "method_calls.npy" if self.granularity == "method" else "class_calls.npy"
+        self.class_relations = np.load(os.path.join(self.str_path, filename))
 
     def build_sim_matrix(self):
         assert self.class_relations is not None
@@ -68,7 +73,7 @@ class LocalStrAnalyzer(StrAnalyzer):
 class LocalSemAnalyzer(SemAnalyzer):
     def __init__(self, data_path: str, granularity: str = "class", is_distributed: bool = False):
         super().__init__(granularity, is_distributed)
-        self.sem_path = data_path
+        self.sem_path = os.path.join(data_path, "semantic_data")
         self.class_names = None
         self.method_names = None
         self.tfidf_vectors = None
@@ -77,8 +82,22 @@ class LocalSemAnalyzer(SemAnalyzer):
     def get_classes(self) -> Union[np.ndarray, List[str]]:
         return self.class_names
 
+    def load_classes(self):
+        # load classes
+        with open(os.path.join(self.sem_path, "class_names.json"), "r") as f:
+            self.class_names = json.load(f)
+
     def get_methods(self) -> Union[np.ndarray, List[str]]:
         return self.method_names
+
+    def load_methods(self):
+        # load classes
+        with open(os.path.join(self.sem_path, "method_names.json"), "r") as f:
+            self.method_names = json.load(f)
+
+    def load_tfidf(self):
+        filename = "method_tfidf.npy" if self.granularity == "method" else "class_tfidf.npy"
+        self.tfidf_vectors = np.load(os.path.join(self.sem_path, filename))
 
     def build_sim_matrix(self):
         assert self.tfidf_vectors is not None
@@ -86,17 +105,9 @@ class LocalSemAnalyzer(SemAnalyzer):
         self.sim_sem = tfidf.dot(tfidf.T)
 
     def build(self):
+        if self.granularity == "method":
+            self.load_methods()
+        else:
+            self.load_classes()
         self.load_tfidf()
         self.build_sim_matrix()
-
-    def load_tfidf(self):
-        if self.granularity == "method":
-            filename = "method_tfidf.parquet"
-            self.tfidf_vectors = pd.read_parquet(os.path.join(self.sem_path, filename))
-            self.method_names = list(self.tfidf_vectors.index.values)
-            self.tfidf_vectors = self.tfidf_vectors.values
-        else:
-            filename = "class_tfidf.parquet"
-            self.tfidf_vectors = pd.read_parquet(os.path.join(self.sem_path, filename))
-            self.class_names = list(self.tfidf_vectors.index.values)
-            self.tfidf_vectors = self.tfidf_vectors.values

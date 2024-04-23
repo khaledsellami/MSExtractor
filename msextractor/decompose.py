@@ -9,6 +9,7 @@ import numpy as np
 
 from .analysis.local import LocalSemAnalyzer, LocalStrAnalyzer
 from .analysis.remote import RemoteSemAnalyzer, RemoteStrAnalyzer
+from .analysis.decparsing import DecParsingStrAnalyzer, DecParsingSemAnalyzer
 from .msextractor import MSExtractor
 
 
@@ -37,7 +38,9 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
               output_path: Optional[str] = os.path.join(os.curdir, "logs"), max_n_clusters: int = 7, ngen: int = 1000,
               pop_size: int = 100, cx_pb: float = 0.3, mut_pb: float = 0.5, att_mut_pb: float = 0.09,
               seed: Optional[int] = None, verbose: bool = False, run_id: Optional[str] = None,
-              calculate_stats: bool = False, granularity: str = "class", is_distributed: bool = False) -> Dict:
+              calculate_stats: bool = False, granularity: str = "class", is_distributed: bool = False,
+              parser_type: Optional[str] = None, *args, **kwargs) -> Dict:
+    assert parser_type in [None, "module", "grpc", "local"]
     starting_time = datetime.datetime.now().strftime("%Y%m%d%H%M")
     run_name = f"{app_name if run_id is None else run_id}_{starting_time}"
     if output_path is not None:
@@ -46,7 +49,7 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
     else:
         result_path = os.path.join(os.curdir, "temp")
         os.makedirs(result_path, exist_ok=True)
-    logging.config.fileConfig(os.path.join(os.curdir, 'logging.conf'), disable_existing_loggers=False,
+    logging.config.fileConfig(os.path.join(os.path.dirname(__file__), 'logging.conf'), disable_existing_loggers=False,
                               defaults={
                                   "logfilename": os.path.join(result_path, "logs.log")
                               })
@@ -57,12 +60,23 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
                 handler.setLevel(logging.DEBUG)
                 logger.debug('Debug logging enabled')
     logger.info(f"decomposing {app_name} with MSExtractor")
-    local_data = not is_url(data_path)
-    logger.debug(f"loading data {'locally' if local_data else 'remotely'} from '{data_path}'")
-    if local_data:
+    if parser_type is None:
+        parser_type = "local" if not is_url(data_path) else "grpc"
+    if parser_type == "module":
+        try:
+            import decparsing
+        except ImportError:
+            parser_type = "local" if not is_url(data_path) else "grpc"
+            logging.warning(f"using 'module' parser type requires the 'decparsing' package to be installed. Reverting "
+                            f"to '{parser_type}' parser type")
+    logger.debug(f"loading data with the parser type {parser_type} from '{data_path}'")
+    if parser_type == "local":
         app_data_path = os.path.join(data_path, app_name)
         stra = LocalStrAnalyzer(app_data_path, granularity=granularity, is_distributed=is_distributed)
         sema = LocalSemAnalyzer(app_data_path, granularity=granularity, is_distributed=is_distributed)
+    elif parser_type == "module":
+        stra = DecParsingStrAnalyzer(app_name, data_path, granularity=granularity, is_distributed=is_distributed, **kwargs)
+        sema = DecParsingSemAnalyzer(app_name, data_path, granularity=granularity, is_distributed=is_distributed, **kwargs)
     else:
         stra = RemoteStrAnalyzer(app_name, data_path, granularity=granularity, is_distributed=is_distributed)
         sema = RemoteSemAnalyzer(app_name, data_path, granularity=granularity, is_distributed=is_distributed)
@@ -84,7 +98,7 @@ def decompose(app_name: str, data_path: str = os.path.join(os.curdir, "data"),
         level=granularity,
         partitions=partitions
     )
-    if not local_data:
+    if parser_type != "local" and data_path is not None:
         decomposition["appRepo"] = data_path
     if output_path is not None:
         logger.debug(f"saving results in {result_path}")
