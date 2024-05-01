@@ -38,7 +38,7 @@ class DecompServer(MSExtractorServicer):
         assert level in ["class", "method"]
         is_distributed = request.isDistributed if request.HasField("isDistributed") else False
         output_path = None
-        verbose = True
+        verbose = False
         max_n_clusters, ngen, pop_size, cx_pb, mut_pb, att_mut_pb, run_id, seed = parse_hyperparameters(request)
         decomposition = decompose(app_name, data_path, output_path, max_n_clusters, ngen, pop_size, cx_pb, mut_pb,
                                   att_mut_pb, seed, verbose, run_id, granularity=level, is_distributed=is_distributed)
