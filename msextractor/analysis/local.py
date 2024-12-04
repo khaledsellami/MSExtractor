@@ -10,14 +10,18 @@ from . import SemAnalyzer, StrAnalyzer
 
 
 class LocalStrAnalyzer(StrAnalyzer):
-    def __init__(self, data_path: str, granularity: str = "class", is_distributed: bool = False):
+    def __init__(self, data_path: str, granularity: str = "class", is_distributed: bool = False,
+                 use_old_logic: bool = False, *args, **kwargs):
         super().__init__(granularity, is_distributed)
         self.str_path = data_path
         # self.metadata_path = os.path.join(data_path, "static_analysis_results")
         self.class_names = None
         self.class_relations = None
         self.method_names = None
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.use_old_logic = use_old_logic
+        self.logger = logging.getLogger("msextractor")
+        if self.use_old_logic:
+            self.logger.warning("Using old logic for loading the data. This will be deprecated soon!")
         self.build()
 
     def get_classes(self) -> Union[np.ndarray, List[str]]:
@@ -44,16 +48,14 @@ class LocalStrAnalyzer(StrAnalyzer):
         return self.method_names
 
     def load_calls(self):
+        filename = "class_calls.parquet" if self.granularity == "class" else "method_calls.parquet"
+        path = self.str_path if not self.use_old_logic else os.path.join(self.str_path, filename)
+        self.class_relations = pd.read_parquet(path)
         if self.granularity == "method":
-            filename = "method_calls.parquet"
-            self.class_relations = pd.read_parquet(os.path.join(self.str_path, filename))
             self.method_names = list(self.class_relations.index.values)
-            self.class_relations = self.class_relations.values
         else:
-            filename = "class_calls.parquet"
-            self.class_relations = pd.read_parquet(os.path.join(self.str_path, filename))
             self.class_names = list(self.class_relations.index.values)
-            self.class_relations = self.class_relations.values
+        self.class_relations = self.class_relations.values
 
     def build_sim_matrix(self):
         assert self.class_relations is not None
@@ -66,12 +68,17 @@ class LocalStrAnalyzer(StrAnalyzer):
 
 
 class LocalSemAnalyzer(SemAnalyzer):
-    def __init__(self, data_path: str, granularity: str = "class", is_distributed: bool = False):
+    def __init__(self, data_path: str, granularity: str = "class", is_distributed: bool = False,
+                 use_old_logic: bool = False, *args, **kwargs):
         super().__init__(granularity, is_distributed)
         self.sem_path = data_path
         self.class_names = None
         self.method_names = None
         self.tfidf_vectors = None
+        self.use_old_logic = use_old_logic
+        self.logger = logging.getLogger("msextractor")
+        if self.use_old_logic:
+            self.logger.warning("Using old logic for loading the data. This will be deprecated soon!")
         self.build()
 
     def get_classes(self) -> Union[np.ndarray, List[str]]:
@@ -90,13 +97,11 @@ class LocalSemAnalyzer(SemAnalyzer):
         self.build_sim_matrix()
 
     def load_tfidf(self):
+        filename = "class_tfidf.parquet" if self.granularity == "class" else "method_tfidf.parquet"
+        path = self.sem_path if not self.use_old_logic else os.path.join(self.sem_path, filename)
+        self.tfidf_vectors = pd.read_parquet(path)
         if self.granularity == "method":
-            filename = "method_tfidf.parquet"
-            self.tfidf_vectors = pd.read_parquet(os.path.join(self.sem_path, filename))
             self.method_names = list(self.tfidf_vectors.index.values)
-            self.tfidf_vectors = self.tfidf_vectors.values
         else:
-            filename = "class_tfidf.parquet"
-            self.tfidf_vectors = pd.read_parquet(os.path.join(self.sem_path, filename))
             self.class_names = list(self.tfidf_vectors.index.values)
-            self.tfidf_vectors = self.tfidf_vectors.values
+        self.tfidf_vectors = self.tfidf_vectors.values

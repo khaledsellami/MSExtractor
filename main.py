@@ -18,7 +18,9 @@ def main():
                                        description="Decompose an application using MSExtractor")
     cli_parser.add_argument('APP', type=str, help='application to decompose')
     cli_parser.add_argument("-d", "--data", help='path for the data or github link for the source code',
-                              type=str, default="./data")
+                              type=str, default=None)
+    cli_parser.add_argument("-c", "--calls", help='path for the calls matrix', type=str, default=None)
+    cli_parser.add_argument("-f", "--tfidf", help='path for the tfidf matrix', type=str, default=None)
     cli_parser.add_argument("-o", "--output", help='path for the output', type=str, default="./logs")
     cli_parser.add_argument("-m", "--microservices", help='maximum number of microservices', type=int, default=7)
     cli_parser.add_argument("-G", "--generations", help='number of generations', type=int, default=2000)
