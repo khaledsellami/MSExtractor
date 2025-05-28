@@ -45,7 +45,7 @@ def get_analyzer(app_name: str, parser_type: Optional[str] = None, data_path: Op
     if parser_type is None:
         parser_type, stra, sema = select_analyzer(app_name, data_path, calls_path, tfidf_path, granularity,
                                                   is_distributed, *args, **kwargs)
-        return stra, sema
+        return parser_type, stra, sema
     elif parser_type == "local":
         if calls_path and tfidf_path:
             stra, sema = init_local_analyzer(data_path, calls_path, tfidf_path, granularity, is_distributed,
